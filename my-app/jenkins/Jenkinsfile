@@ -11,13 +11,13 @@ pipeline {
     stages {
         stage('Checkout Code') {
             steps {
-                git branch: 'main', url: 'https://github.com/ash271182/apps/blob/main/my-app'
+                git branch: 'main', url: 'https://github.com/ash271182/apps.git'
             }
         }
 
         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t /: -f docker/Dockerfile .'
+                sh 'docker build -t /: -f my-app/docker/Dockerfile .'
             }
         }
 
@@ -32,7 +32,7 @@ pipeline {
         stage('Deploy to Kubernetes') {
             steps {
                 withKubeConfig([credentialsId: 'KUBE_CONFIG']) {
-                    sh 'kubectl apply -f k8s/'
+                    sh 'kubectl apply -f my-app/k8s/'
                 }
             }
         }
