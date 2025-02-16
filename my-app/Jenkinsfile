@@ -1,0 +1,34 @@
+pipeline {
+    agent any
+    environment {
+        IMAGE_NAME = "my-docker-repo/app-ui"
+        KUBE_CONFIG = credentials('KUBE_CONFIG')
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/my-repo/app-ui.git'
+            }
+        }
+        
+        stage('Build & Push Docker Image') {
+            steps {
+                script {
+                    def imageTag = "latest"
+                    sh "docker build -t \${IMAGE_NAME}:\${imageTag} ."
+                    sh "docker push \${IMAGE_NAME}:\${imageTag}"
+                }
+            }
+        }
+
+        stage('Deploy to Kubernetes') {
+            steps {
+                script {
+                    withKubeConfig([credentialsId: 'KUBE_CONFIG']) {
+                        sh "helm upgrade --install app-ui helm/ --set image.repository=\${IMAGE_NAME},image.tag=latest"
+                    }
+                }
+            }
+        }
+    }
+}
