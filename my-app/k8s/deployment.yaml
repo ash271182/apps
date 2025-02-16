@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-app-backend
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: my-app-backend
+  template:
+    metadata:
+      labels:
+        app: my-app-backend
+    spec:
+      containers:
+        - name: backend
+          image: mydockerhub/my-app-backend:latest
+          ports:
+            - containerPort: 5000
+          env:
+            - name: DATABASE_URL
+              value: "postgres://postgres:password@db:5432/appdb"
